@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Probability Arena</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: linear-gradient(135deg, #001a33, #004d7a);
+      color: #0f172a;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .app {
+      background: #f9fafb;
+      max-width: 1100px;
+      width: 100%;
+      border-radius: 18px;
+      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.4);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: radial-gradient(circle at top, #22c55e, #0f766e);
+      color: white;
+      padding: 20px 26px;
+    }
+
+    header h1 {
+      font-size: 1.9rem;
+      margin-bottom: 4px;
+    }
+
+    header p {
+      font-size: 0.95rem;
+      opacity: 0.9;
+    }
+
+    .mode-tabs {
+      display: flex;
+      gap: 8px;
+      padding: 12px 16px;
+      background: #e5e7eb;
+      flex-wrap: wrap;
+    }
+
+    .mode-tab {
+      border: none;
+      background: #d1d5db;
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.15s ease-out;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .mode-tab span.emoji {
+      font-size: 1.1rem;
+    }
+
+    .mode-tab.active {
+      background: #0f766e;
+      color: white;
+      box-shadow: 0 0 0 2px rgba(15, 118, 110, 0.4);
+      transform: translateY(-1px);
+    }
+
+    main {
+      padding: 16px 18px 20px 18px;
+      overflow-y: auto;
+    }
+
+    .mode {
+      display: none;
+    }
+
+    .mode.active {
+      display: block;
+    }
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 16px 18px 18px 18px;
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+      margin-bottom: 16px;
+    }
+
+    .card h2 {
+      font-size: 1.4rem;
+      margin-bottom: 4px;
+    }
+
+    .subtitle {
+      font-size: 0.9rem;
+      color: #4b5563;
+      margin-bottom: 12px;
+    }
+
+    .flex-row {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .column {
+      flex: 1 1 260px;
+      min-width: 0;
+    }
+
+    h3 {
+      font-size: 1rem;
+      margin-bottom: 6px;
+      color: #111827;
+    }
+
+    p {
+      font-size: 0.9rem;
+      margin-bottom: 6px;
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .pill-button {
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: 0.9rem;
+      border: 1px solid #d1d5db;
+      background: #f3f4f6;
+      cursor: pointer;
+      transition: all 0.1s ease-out;
+    }
+
+    .pill-button:hover {
+      background: #e5e7eb;
+    }
+
+    .pill-button.active {
+      background: #0ea5e9;
+      border-color: #0ea5e9;
+      color: white;
+      box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.4);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      border: none;
+      padding: 7px 14px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      margin-right: 6px;
+      margin-bottom: 6px;
+      background: #0f766e;
+      color: white;
+      transition: all 0.12s ease-out;
+    }
+
+    .btn.secondary {
+      background: #4b5563;
+    }
+
+    .btn.reset {
+      background: #b91c1c;
+    }
+
+    .btn:hover {
+      filter: brightness(1.05);
+      transform: translateY(-1px);
+    }
+
+    .btn:active {
+      transform: translateY(0px) scale(0.98);
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 3px 7px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      background: #e5e7eb;
+      color: #374151;
+      margin-bottom: 6px;
+    }
+
+    .results-box {
+      background: #f9fafb;
+      border-radius: 12px;
+      padding: 10px 12px;
+      border: 1px solid #e5e7eb;
+      font-size: 0.88rem;
+    }
+
+    .results-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+
+    .results-row span.label {
+      color: #4b5563;
+    }
+
+    .results-row span.value {
+      font-weight: 600;
+      color: #111827;
+    }
+
+    .bar-track {
+      margin-top: 6px;
+      width: 100%;
+      height: 14px;
+      background: #e5e7eb;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #22c55e, #a3e635);
+      width: 0%;
+      transition: width 0.25s ease-out;
+    }
+
+    .small {
+      font-size: 0.78rem;
+      color: #6b7280;
+    }
+
+    .mono {
+      font-family: "SF Mono", ui-monospace, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+
+    .die {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      margin-right: 4px;
+      border-radius: 8px;
+      background: white;
+      border: 1px solid #d1d5db;
+      font-weight: 600;
+      box-shadow: 0 3px 6px rgba(15, 23, 42, 0.08);
+    }
+
+    .coin-seq {
+      font-size: 1.1rem;
+      letter-spacing: 4px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+    }
+
+    .badge.win {
+      background: #dcfce7;
+      color: #166534;
+      border: 1px solid #bbf7d0;
+    }
+
+    .badge.lose {
+      background: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .mystery-cell {
+      background: white;
+      border-radius: 12px;
+      padding: 8px 10px;
+      border: 1px solid #e5e7eb;
+      font-size: 0.85rem;
+    }
+
+    .mystery-name {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .mystery-bar-track {
+      width: 100%;
+      height: 10px;
+      background: #e5e7eb;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+
+    .mystery-bar-fill {
+      height: 100%;
+      background: #6366f1;
+      width: 0%;
+      transition: width 0.25s ease-out;
+    }
+
+    @media (max-width: 700px) {
+      header h1 {
+        font-size: 1.5rem;
+      }
+      .card {
+        padding: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1>Probability Arena</h1>
+      <p>Project this, take class votes, then let Chance battle your students in real time.</p>
+    </header>
+
+    <div class="mode-tabs">
+      <button class="mode-tab active" data-target="mode-dice">
+        <span class="emoji">🎲</span> Dice Duel
+      </button>
+      <button class="mode-tab" data-target="mode-marbles">
+        <span class="emoji">🧪</span> Marble Madness
+      </button>
+      <button class="mode-tab" data-target="mode-coins">
+        <span class="emoji">🪙</span> Coin Chaos
+      </button>
+      <button class="mode-tab" data-target="mode-mystery">
+        <span class="emoji">🎁</span> Mystery Box
+      </button>
+    </div>
+
+    <main>
+      <!-- DICE DUEL -->
+      <section id="mode-dice" class="mode active">
+        <div class="card">
+          <h2>🎲 Dice Duel</h2>
+          <p class="subtitle">
+            Class chooses a number from 1–6. Roll three dice.  
+            The class wins if <strong>at least one die</strong> shows their number.
+          </p>
+
+          <div class="flex-row">
+            <div class="column">
+              <span class="tag">Teacher flow</span>
+              <p class="small">
+                1️⃣ Ask the class to vote for a target number.  
+                2️⃣ Click that number below.  
+                3️⃣ Click “Roll” and discuss the outcome.
+              </p>
+
+              <h3>1. Class picks a target number</h3>
+              <div class="pill-row" id="dice-number-buttons">
+                <!-- Buttons 1–6 generated in JS just in case, but here's static too -->
+                <button class="pill-button" data-dice-number="1">1</button>
+                <button class="pill-button" data-dice-number="2">2</button>
+                <button class="pill-button" data-dice-number="3">3</button>
+                <button class="pill-button" data-dice-number="4">4</button>
+                <button class="pill-button" data-dice-number="5">5</button>
+                <button class="pill-button" data-dice-number="6">6</button>
+              </div>
+
+              <h3>2. Run the duel</h3>
+              <button class="btn" id="dice-roll-1">
+                ▶ Roll once
+              </button>
+              <button class="btn secondary" id="dice-roll-10">
+                ▶▶ Roll 10 times
+              </button>
+              <button class="btn reset" id="dice-reset">
+                ⟲ Reset scores
+              </button>
+              <p class="small" style="margin-top:4px;">
+                Great for talking about “at least one”, complements, and long-run probability.
+              </p>
+            </div>
+
+            <div class="column">
+              <h3>Latest roll</h3>
+              <div id="dice-last-roll" style="margin-bottom:4px;">
+                <span class="small">No rolls yet.</span>
+              </div>
+              <p>
+                Outcome:
+                <span id="dice-last-outcome" class="badge">–</span>
+              </p>
+
+              <div class="results-box" style="margin-top:8px;">
+                <div class="results-row">
+                  <span class="label">Class wins (event):</span>
+                  <span class="value">
+                    <span id="dice-wins">0</span> /
+                    <span id="dice-trials">0</span>
+                  </span>
+                </div>
+                <div class="results-row">
+                  <span class="label">Experimental P(win):</span>
+                  <span class="value" id="dice-exp">–</span>
+                </div>
+                <div class="results-row">
+                  <span class="label">Theoretical P(win):</span>
+                  <span class="value mono">1 − (5/6)³ ≈ 0.421</span>
+                </div>
+
+                <div class="bar-track">
+                  <div id="dice-bar" class="bar-fill"></div>
+                </div>
+              </div>
+              <p class="small" style="margin-top:4px;">
+                Ask: “Why doesn’t the experimental probability match the theoretical one yet? What happens as we roll more?”
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- MARBLE MADNESS -->
+      <section id="mode-marbles" class="mode">
+        <div class="card">
+          <h2>🧪 Marble Madness</h2>
+          <p class="subtitle">
+            A jar has <strong>3 red, 2 blue, 1 green</strong> marble (6 total).  
+            Each trial draws <strong>one marble with replacement</strong>.
+          </p>
+
+          <div class="flex-row">
+            <div class="column">
+              <span class="tag">Teacher flow</span>
+              <p class="small">
+                1️⃣ Show the jar contents.  
+                2️⃣ Students choose a colour to back.  
+                3️⃣ Draw marbles and track how often their colour appears.
+              </p>
+
+              <h3>1. Jar contents</h3>
+              <p>
+                Red = 3 &nbsp;|&nbsp; Blue = 2 &nbsp;|&nbsp; Green = 1  
+                <span class="small">(Total marbles = 6)</span>
+              </p>
+
+              <h3 style="margin-top:8px;">2. Class chooses a colour</h3>
+              <div class="pill-row" id="marble-color-buttons">
+                <button class="pill-button" data-color="red">🔴 Red</button>
+                <button class="pill-button" data-color="blue">🔵 Blue</button>
+                <button class="pill-button" data-color="green">🟢 Green</button>
+              </div>
+
+              <h3>3. Draw from the jar</h3>
+              <button class="btn" id="marble-draw-1">▶ Draw once</button>
+              <button class="btn secondary" id="marble-draw-10">▶▶ Draw 10 times</button>
+              <button class="btn reset" id="marble-reset">⟲ Reset jar stats</button>
+              <p class="small" style="margin-top:4px;">
+                Perfect for “favourable outcomes / total outcomes” and connecting to fractions.
+              </p>
+            </div>
+
+            <div class="column">
+              <h3>Latest draw</h3>
+              <p>
+                Marble drawn:
+                <span id="marble-last" class="badge">–</span>
+              </p>
+
+              <div class="results-box" style="margin-top:8px;">
+                <div class="results-row">
+                  <span class="label">Class colour wins:</span>
+                  <span class="value">
+                    <span id="marble-wins">0</span> /
+                    <span id="marble-trials">0</span>
+                  </span>
+                </div>
+                <div class="results-row">
+                  <span class="label">Experimental P(win):</span>
+                  <span class="value" id="marble-exp">–</span>
+                </div>
+                <div class="results-row">
+                  <span class="label">Theoretical P(win):</span>
+                  <span class="value mono" id="marble-theory">–</span>
+                </div>
+                <div class="bar-track">
+                  <div id="marble-bar" class="bar-fill"></div>
+                </div>
+              </div>
+
+              <p class="small" style="margin-top:4px;">
+                Ask: “Why is red more likely than green? How can we see that from the jar without drawing?”
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- COIN CHAOS -->
+      <section id="mode-coins" class="mode">
+        <div class="card">
+          <h2>🪙 Coin Chaos</h2>
+          <p class="subtitle">
+            Flip <strong>3 fair coins</strong> each trial.  
+            The class chooses an event, e.g. “Exactly 2 heads”.
+          </p>
+
+          <div class="flex-row">
+            <div class="column">
+              <span class="tag">Teacher flow</span>
+              <p class="small">
+                1️⃣ Explain the event options.  
+                2️⃣ Students vote on which event they think is “best”.  
+                3️⃣ Flip coins and see how often their event happens.
+              </p>
+
+              <h3>1. Choose an event</h3>
+              <div class="pill-row" id="coin-event-buttons">
+                <button class="pill-button" data-event="allHeads">All heads (HHH)</button>
+                <button class="pill-button" data-event="exactlyTwoHeads">Exactly 2 heads</button>
+                <button class="pill-button" data-event="atLeastOneHead">At least 1 head</button>
+              </div>
+
+              <h3>2. Flip coins</h3>
+              <button class="btn" id="coin-flip-1">▶ Flip once</button>
+              <button class="btn secondary" id="coin-flip-10">▶▶ Flip 10 times</button>
+              <button class="btn reset" id="coin-reset">⟲ Reset flips</button>
+              <p class="small" style="margin-top:4px;">
+                You can pause to draw a tree diagram or sample space (8 outcomes) and compare.
+              </p>
+            </div>
+
+            <div class="column">
+              <h3>Latest sequence</h3>
+              <div id="coin-seq" class="coin-seq">–</div>
+              <p>
+                Event result:
+                <span id="coin-outcome" class="badge">–</span>
+              </p>
+
+              <div class="results-box" style="margin-top:8px;">
+                <div class="results-row">
+                  <span class="label">Class event occurs:</span>
+                  <span class="value">
+                    <span id="coin-wins">0</span> /
+                    <span id="coin-trials">0</span>
+                  </span>
+                </div>
+                <div class="results-row">
+                  <span class="label">Experimental P(event):</span>
+                  <span class="value" id="coin-exp">–</span>
+                </div>
+                <div class="results-row">
+                  <span class="label">Theoretical P(event):</span>
+                  <span class="value mono" id="coin-theory">–</span>
+                </div>
+
+                <div class="bar-track">
+                  <div id="coin-bar" class="bar-fill"></div>
+                </div>
+              </div>
+
+              <p class="small" style="margin-top:4px;">
+                Theoretical values for 3 coins (8 outcomes):  
+                All heads = 1/8, Exactly 2 heads = 3/8, At least 1 head = 7/8.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- MYSTERY BOX -->
+      <section id="mode-mystery" class="mode">
+        <div class="card">
+          <h2>🎁 Mystery Box</h2>
+          <p class="subtitle">
+            The computer secretly chooses one of three outcomes with fixed probabilities.  
+            Students must use experimental results to guess the hidden distribution.
+          </p>
+
+          <div class="flex-row">
+            <div class="column">
+              <span class="tag">Teacher flow</span>
+              <p class="small">
+                1️⃣ Tell students the box can give Gold, Silver, or Bronze.  
+                2️⃣ Run many trials and track the frequencies.  
+                3️⃣ Ask them to estimate the true probabilities before revealing.
+              </p>
+
+              <h3>1. Run trials</h3>
+              <button class="btn" id="mystery-draw-1">▶ Draw once</button>
+              <button class="btn secondary" id="mystery-draw-10">▶▶ Draw 10 times</button>
+              <button class="btn reset" id="mystery-reset">⟲ Reset mystery box</button>
+
+              <h3 style="margin-top:10px;">2. Reveal the secret probabilities</h3>
+              <button class="btn" id="mystery-reveal">👀 Reveal Mystery</button>
+              <p class="small" style="margin-top:4px;">
+                Try to get students to commit to a guess (e.g. 50% Gold, 30% Silver, 20% Bronze) before clicking Reveal.
+              </p>
+            </div>
+
+            <div class="column">
+              <h3>Latest draw</h3>
+              <p>
+                Outcome:
+                <span id="mystery-last" class="badge">–</span>
+              </p>
+
+              <div class="results-box" style="margin-top:8px;">
+                <div class="results-row">
+                  <span class="label">Total draws:</span>
+                  <span class="value" id="mystery-total">0</span>
+                </div>
+              </div>
+
+              <div class="grid-3">
+                <div class="mystery-cell">
+                  <div class="mystery-name">🥇 Gold</div>
+                  <div class="small">
+                    Count: <span id="gold-count">0</span><br>
+                    Experimental: <span id="gold-exp">–</span><br>
+                    True P: <span id="gold-true">?</span>
+                  </div>
+                  <div class="mystery-bar-track">
+                    <div id="gold-bar" class="mystery-bar-fill"></div>
+                  </div>
+                </div>
+                <div class="mystery-cell">
+                  <div class="mystery-name">🥈 Silver</div>
+                  <div class="small">
+                    Count: <span id="silver-count">0</span><br>
+                    Experimental: <span id="silver-exp">–</span><br>
+                    True P: <span id="silver-true">?</span>
+                  </div>
+                  <div class="mystery-bar-track">
+                    <div id="silver-bar" class="mystery-bar-fill"></div>
+                  </div>
+                </div>
+                <div class="mystery-cell">
+                  <div class="mystery-name">🥉 Bronze</div>
+                  <div class="small">
+                    Count: <span id="bronze-count">0</span><br>
+                    Experimental: <span id="bronze-exp">–</span><br>
+                    True P: <span id="bronze-true">?</span>
+                  </div>
+                  <div class="mystery-bar-track">
+                    <div id="bronze-bar" class="mystery-bar-fill"></div>
+                  </div>
+                </div>
+              </div>
+
+              <p class="small" style="margin-top:6px;">
+                (Secret setting: Gold = 0.5, Silver = 0.3, Bronze = 0.2)
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    // --------- Utility helpers ----------
+    function randomInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function formatProb(num) {
+      if (!isFinite(num) || isNaN(num)) return "–";
+      return num.toFixed(3);
+    }
+
+    function updateBar(barEl, p) {
+      if (!barEl) return;
+      const pct = Math.max(0, Math.min(1, p || 0)) * 100;
+      barEl.style.width = pct + "%";
+    }
+
+    // --------- Tab switching ----------
+    const tabs = document.querySelectorAll(".mode-tab");
+    const modes = document.querySelectorAll(".mode");
+
+    tabs.forEach(tab => {
+      tab.addEventListener("click", () => {
+        const target = tab.getAttribute("data-target");
+
+        tabs.forEach(t => t.classList.remove("active"));
+        modes.forEach(m => m.classList.remove("active"));
+
+        tab.classList.add("active");
+        const modeEl = document.getElementById(target);
+        if (modeEl) modeEl.classList.add("active");
+      });
+    });
+
+    // --------- DICE DUEL ----------
+    const diceButtons = document.querySelectorAll("[data-dice-number]");
+    let diceState = {
+      target: null,
+      wins: 0,
+      trials: 0
+    };
+
+    diceButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        diceButtons.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        diceState.target = parseInt(btn.getAttribute("data-dice-number"), 10);
+      });
+    });
+
+    const diceLastRollEl = document.getElementById("dice-last-roll");
+    const diceLastOutcomeEl = document.getElementById("dice-last-outcome");
+    const diceWinsEl = document.getElementById("dice-wins");
+    const diceTrialsEl = document.getElementById("dice-trials");
+    const diceExpEl = document.getElementById("dice-exp");
+    const diceBarEl = document.getElementById("dice-bar");
+
+    function runDiceTrials(n) {
+      if (!diceState.target) {
+        alert("Ask the class to choose a target number (1–6) first.");
+        return;
+      }
+      let lastDice = [];
+      let lastWin = false;
+      for (let i = 0; i < n; i++) {
+        const d1 = randomInt(1, 6);
+        const d2 = randomInt(1, 6);
+        const d3 = randomInt(1, 6);
+        lastDice = [d1, d2, d3];
+        lastWin = (d1 === diceState.target || d2 === diceState.target || d3 === diceState.target);
+        diceState.trials++;
+        if (lastWin) diceState.wins++;
+      }
+
+      diceLastRollEl.innerHTML =
+        lastDice.map(v => `<span class="die">${v}</span>`).join("");
+
+      if (lastDice.length) {
+        diceLastOutcomeEl.textContent = lastWin ? "Class wins! 🎉" : "Chance wins 😈";
+        diceLastOutcomeEl.className = "badge " + (lastWin ? "win" : "lose");
+      }
+
+      diceWinsEl.textContent = diceState.wins;
+      diceTrialsEl.textContent = diceState.trials;
+      const exp = diceState.wins / (diceState.trials || 1);
+      diceExpEl.textContent = formatProb(exp);
+      updateBar(diceBarEl, exp);
+    }
+
+    document.getElementById("dice-roll-1").addEventListener("click", () => runDiceTrials(1));
+    document.getElementById("dice-roll-10").addEventListener("click", () => runDiceTrials(10));
+    document.getElementById("dice-reset").addEventListener("click", () => {
+      diceState = { target: diceState.target, wins: 0, trials: 0 };
+      diceLastRollEl.innerHTML = '<span class="small">No rolls yet.</span>';
+      diceLastOutcomeEl.textContent = "–";
+      diceLastOutcomeEl.className = "badge";
+      diceWinsEl.textContent = "0";
+      diceTrialsEl.textContent = "0";
+      diceExpEl.textContent = "–";
+      updateBar(diceBarEl, 0);
+    });
+
+    // --------- MARBLE MADNESS ----------
+    const marbleButtons = document.querySelectorAll("[data-color]");
+    let marbleState = {
+      color: null,
+      wins: 0,
+      trials: 0
+    };
+
+    const marbleLastEl = document.getElementById("marble-last");
+    const marbleWinsEl = document.getElementById("marble-wins");
+    const marbleTrialsEl = document.getElementById("marble-trials");
+    const marbleExpEl = document.getElementById("marble-exp");
+    const marbleTheoryEl = document.getElementById("marble-theory");
+    const marbleBarEl = document.getElementById("marble-bar");
+
+    const marbleCounts = {
+      red: 3,
+      blue: 2,
+      green: 1
+    };
+
+    function updateMarbleTheory() {
+      if (!marbleState.color) {
+        marbleTheoryEl.textContent = "–";
+        return;
+      }
+      const total = 3 + 2 + 1;
+      const count = marbleCounts[marbleState.color];
+      const frac = count + "/" + total;
+      const dec = (count / total).toFixed(3);
+      marbleTheoryEl.textContent = frac + " ≈ " + dec;
+    }
+
+    marbleButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        marbleButtons.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        marbleState.color = btn.getAttribute("data-color");
+        updateMarbleTheory();
+      });
+    });
+
+    function drawMarbleOnce() {
+      const r = randomInt(1, 6);
+      let result;
+      if (r <= 3) result = "red";
+      else if (r <= 5) result = "blue";
+      else result = "green";
+      return result;
+    }
+
+    function runMarbleTrials(n) {
+      if (!marbleState.color) {
+        alert("Ask the class to choose a colour first.");
+        return;
+      }
+      let last = null;
+      for (let i = 0; i < n; i++) {
+        const res = drawMarbleOnce();
+        last = res;
+        marbleState.trials++;
+        if (res === marbleState.color) marbleState.wins++;
+      }
+
+      if (last) {
+        let label = "–";
+        if (last === "red") label = "🔴 Red";
+        if (last === "blue") label = "🔵 Blue";
+        if (last === "green") label = "🟢 Green";
+        marbleLastEl.textContent = label;
+        marbleLastEl.className = "badge";
+      }
+
+      marbleWinsEl.textContent = marbleState.wins;
+      marbleTrialsEl.textContent = marbleState.trials;
+      const exp = marbleState.wins / (marbleState.trials || 1);
+      marbleExpEl.textContent = formatProb(exp);
+      updateBar(marbleBarEl, exp);
+    }
+
+    document.getElementById("marble-draw-1").addEventListener("click", () => runMarbleTrials(1));
+    document.getElementById("marble-draw-10").addEventListener("click", () => runMarbleTrials(10));
+    document.getElementById("marble-reset").addEventListener("click", () => {
+      marbleState.wins = 0;
+      marbleState.trials = 0;
+      marbleWinsEl.textContent = "0";
+      marbleTrialsEl.textContent = "0";
+      marbleExpEl.textContent = "–";
+      marbleLastEl.textContent = "–";
+      marbleLastEl.className = "badge";
+      updateBar(marbleBarEl, 0);
+    });
+
+    // --------- COIN CHAOS ----------
+    const coinButtons = document.querySelectorAll("[data-event]");
+    let coinState = {
+      event: null,
+      wins: 0,
+      trials: 0
+    };
+
+    const coinSeqEl = document.getElementById("coin-seq");
+    const coinOutcomeEl = document.getElementById("coin-outcome");
+    const coinWinsEl = document.getElementById("coin-wins");
+    const coinTrialsEl = document.getElementById("coin-trials");
+    const coinExpEl = document.getElementById("coin-exp");
+    const coinTheoryEl = document.getElementById("coin-theory");
+    const coinBarEl = document.getElementById("coin-bar");
+
+    const coinTheoryMap = {
+      allHeads: "1/8 ≈ 0.125",
+      exactlyTwoHeads: "3/8 ≈ 0.375",
+      atLeastOneHead: "7/8 ≈ 0.875"
+    };
+
+    function updateCoinTheory() {
+      if (!coinState.event) {
+        coinTheoryEl.textContent = "–";
+        return;
+      }
+      coinTheoryEl.textContent = coinTheoryMap[coinState.event] || "–";
+    }
+
+    coinButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        coinButtons.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        coinState.event = btn.getAttribute("data-event");
+        updateCoinTheory();
+      });
+    });
+
+    function flipThreeCoinsOnce() {
+      const coins = [];
+      for (let i = 0; i < 3; i++) {
+        coins.push(Math.random() < 0.5 ? "H" : "T");
+      }
+      return coins;
+    }
+
+    function eventHappens(coins, event) {
+      const heads = coins.filter(c => c === "H").length;
+      if (event === "allHeads") return heads === 3;
+      if (event === "exactlyTwoHeads") return heads === 2;
+      if (event === "atLeastOneHead") return heads >= 1;
+      return false;
+    }
+
+    function runCoinTrials(n) {
+      if (!coinState.event) {
+        alert("Ask the class to choose an event first.");
+        return;
+      }
+
+      let lastCoins = [];
+      let lastWin = false;
+
+      for (let i = 0; i < n; i++) {
+        const coins = flipThreeCoinsOnce();
+        lastCoins = coins;
+        lastWin = eventHappens(coins, coinState.event);
+        coinState.trials++;
+        if (lastWin) coinState.wins++;
+      }
+
+      if (lastCoins.length) {
+        coinSeqEl.textContent = lastCoins.join(" ");
+        coinOutcomeEl.textContent = lastWin ? "Event occurred! 🎉" : "No event 😈";
+        coinOutcomeEl.className = "badge " + (lastWin ? "win" : "lose");
+      }
+
+      coinWinsEl.textContent = coinState.wins;
+      coinTrialsEl.textContent = coinState.trials;
+      const exp = coinState.wins / (coinState.trials || 1);
+      coinExpEl.textContent = formatProb(exp);
+      updateBar(coinBarEl, exp);
+    }
+
+    document.getElementById("coin-flip-1").addEventListener("click", () => runCoinTrials(1));
+    document.getElementById("coin-flip-10").addEventListener("click", () => runCoinTrials(10));
+    document.getElementById("coin-reset").addEventListener("click", () => {
+      coinState.wins = 0;
+      coinState.trials = 0;
+      coinWinsEl.textContent = "0";
+      coinTrialsEl.textContent = "0";
+      coinSeqEl.textContent = "–";
+      coinOutcomeEl.textContent = "–";
+      coinOutcomeEl.className = "badge";
+      coinExpEl.textContent = "–";
+      updateBar(coinBarEl, 0);
+    });
+
+    // --------- MYSTERY BOX ----------
+    const mysteryLastEl = document.getElementById("mystery-last");
+    const mysteryTotalEl = document.getElementById("mystery-total");
+    const goldCountEl = document.getElementById("gold-count");
+    const silverCountEl = document.getElementById("silver-count");
+    const bronzeCountEl = document.getElementById("bronze-count");
+    const goldExpEl = document.getElementById("gold-exp");
+    const silverExpEl = document.getElementById("silver-exp");
+    const bronzeExpEl = document.getElementById("bronze-exp");
+    const goldTrueEl = document.getElementById("gold-true");
+    const silverTrueEl = document.getElementById("silver-true");
+    const bronzeTrueEl = document.getElementById("bronze-true");
+    const goldBarEl = document.getElementById("gold-bar");
+    const silverBarEl = document.getElementById("silver-bar");
+    const bronzeBarEl = document.getElementById("bronze-bar");
+
+    const mysteryTrue = {
+      gold: 0.5,
+      silver: 0.3,
+      bronze: 0.2
+    };
+
+    let mysteryState = {
+      gold: 0,
+      silver: 0,
+      bronze: 0,
+      total: 0,
+      revealed: false
+    };
+
+    function drawMysteryOnce() {
+      const r = Math.random();
+      if (r < mysteryTrue.gold) return "gold";
+      if (r < mysteryTrue.gold + mysteryTrue.silver) return "silver";
+      return "bronze";
+    }
+
+    function updateMysteryUI(lastOutcome) {
+      if (lastOutcome) {
+        let label = "–";
+        if (lastOutcome === "gold") label = "🥇 Gold";
+        if (lastOutcome === "silver") label = "🥈 Silver";
+        if (lastOutcome === "bronze") label = "🥉 Bronze";
+        mysteryLastEl.textContent = label;
+        mysteryLastEl.className = "badge";
+      }
+
+      mysteryTotalEl.textContent = mysteryState.total;
+      goldCountEl.textContent = mysteryState.gold;
+      silverCountEl.textContent = mysteryState.silver;
+      bronzeCountEl.textContent = mysteryState.bronze;
+
+      const total = Math.max(1, mysteryState.total);
+      const goldP = mysteryState.gold / total;
+      const silverP = mysteryState.silver / total;
+      const bronzeP = mysteryState.bronze / total;
+
+      goldExpEl.textContent = mysteryState.total ? formatProb(goldP) : "–";
+      silverExpEl.textContent = mysteryState.total ? formatProb(silverP) : "–";
+      bronzeExpEl.textContent = mysteryState.total ? formatProb(bronzeP) : "–";
+
+      updateBar(goldBarEl, goldP);
+      updateBar(silverBarEl, silverP);
+      updateBar(bronzeBarEl, bronzeP);
+
+      if (mysteryState.revealed) {
+        goldTrueEl.textContent = "0.500";
+        silverTrueEl.textContent = "0.300";
+        bronzeTrueEl.textContent = "0.200";
+      } else {
+        goldTrueEl.textContent = "?";
+        silverTrueEl.textContent = "?";
+        bronzeTrueEl.textContent = "?";
+      }
+    }
+
+    function runMysteryTrials(n) {
+      let last = null;
+      for (let i = 0; i < n; i++) {
+        const outcome = drawMysteryOnce();
+        last = outcome;
+        mysteryState[outcome]++;
+        mysteryState.total++;
+      }
+      updateMysteryUI(last);
+    }
+
+    document.getElementById("mystery-draw-1").addEventListener("click", () => runMysteryTrials(1));
+    document.getElementById("mystery-draw-10").addEventListener("click", () => runMysteryTrials(10));
+    document.getElementById("mystery-reset").addEventListener("click", () => {
+      mysteryState = { gold: 0, silver: 0, bronze: 0, total: 0, revealed: false };
+      updateMysteryUI(null);
+      mysteryLastEl.textContent = "–";
+      mysteryLastEl.className = "badge";
+    });
+    document.getElementById("mystery-reveal").addEventListener("click", () => {
+      mysteryState.revealed = true;
+      updateMysteryUI(null);
+      alert("Mystery revealed: Gold = 0.5, Silver = 0.3, Bronze = 0.2");
+    });
+
+    // Initial UI reset for mystery bars
+    updateMysteryUI(null);
+  </script>
+</body>
+</html>
